@@ -2,7 +2,7 @@ resource "aws_lb" "po_lin_multistack" {
   name               = "po-lin-main-app-lb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [aws_subnet.po_lin_public_subnet.id, aws_subnet.po_lin_private_subnet_redis.id]
+  subnets            = [aws_subnet.po_lin_public_subnet_1.id, aws_subnet.po_lin_public_subnet_2.id]
 #  security_groups    = [module.lb_security_group.this_security_group_id]
 }
 
@@ -34,13 +34,22 @@ resource "aws_lb_target_group" "po_lin_multistack" {
 resource "aws_instance" "po_lin_server_1" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
-  subnet_id     = aws_subnet.po_lin_public_subnet.id
+  subnet_id     = aws_subnet.po_lin_public_subnet_1.id
   tags = {
-    Name = "po_lin_frontend"
+    Name = "po_lin_frontend_1"
   }
 }
 
-resource "aws_instance" "server_2" {
+resource "aws_instance" "po_lin_server_2" {
+  ami           = "ami-0025245f3ca0bcc82"
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.po_lin_public_subnet_2.id
+  tags = {
+    Name = "po_lin_frontend_2"
+  }
+}
+
+resource "aws_instance" "po_lin_server_3" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.po_lin_private_subnet_redis.id
@@ -49,7 +58,7 @@ resource "aws_instance" "server_2" {
   }
 }
 
-resource "aws_instance" "server_3" {
+resource "aws_instance" "po_lin_server_4" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.po_lin_private_subnet_postgresql.id
@@ -90,14 +99,25 @@ resource "aws_vpc" "po_lin_vpc" {
  }
 }
 
-resource "aws_subnet" "po_lin_public_subnet" {
+resource "aws_subnet" "po_lin_public_subnet_1" {
   vpc_id                  = aws_vpc.po_lin_vpc.id
   cidr_block              = "20.0.1.0/24"
   map_public_ip_on_launch = true
   availability_zone       = "eu-west-1a"
  
   tags = {
-    Name = "Po-Lin-PublicSubnet"
+    Name = "Po-Lin-PublicSubnet-1"
+  }
+}
+
+resource "aws_subnet" "po_lin_public_subnet_2" {
+  vpc_id                  = aws_vpc.po_lin_vpc.id
+  cidr_block              = "20.0.4.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "eu-west-1b"
+ 
+  tags = {
+    Name = "Po-Lin-PublicSubnet-2"
   }
 }
 
@@ -171,8 +191,13 @@ resource "aws_subnet" "po_lin_private_subnet_postgresql" {
   }
 }
 
-resource "aws_route_table_association" "po_lin_public_rt_assoc" {
-  subnet_id      = aws_subnet.po_lin_public_subnet.id
+resource "aws_route_table_association" "po_lin_public_rt_assoc_1" {
+  subnet_id      = aws_subnet.po_lin_public_subnet_1.id
+  route_table_id = aws_route_table.po_lin_public_rt.id
+}
+
+resource "aws_route_table_association" "po_lin_public_rt_assoc_2" {
+  subnet_id      = aws_subnet.po_lin_public_subnet_2.id
   route_table_id = aws_route_table.po_lin_public_rt.id
 }
 
