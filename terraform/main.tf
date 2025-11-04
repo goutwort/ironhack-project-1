@@ -35,27 +35,71 @@ resource "aws_instance" "tiffany_server_1" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.tiffany_public_subnet_1.id
-  security_groups = [aws_security_group.tiffany_public_SG.id]
+  vpc_security_group_ids = [aws_security_group.tiffany_public_SG.id]
+  key_name = "po-lin-day20-lab-key-pair"
+
+#  provisioner "remote-exec" {
+#    inline = [
+#      "echo 'Hello'",
+#    ]    
+#    connection {
+#      type        = "ssh"
+#      user        = "ubuntu"
+#      private_key = file("~/.ssh/po-lin-day20-lab-key-pair.pem")
+#      host        = self.public_ip
+#    }
+#  }
+
   tags = {
     Name = "tiffany_frontend_1"
   }
 }
 
+
 resource "aws_instance" "tiffany_server_2" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.tiffany_public_subnet_2.id
-  security_groups = [aws_security_group.tiffany_public_SG.id]
+  vpc_security_group_ids = [aws_security_group.tiffany_public_SG.id]
+  key_name = "po-lin-day20-lab-key-pair"
+
+#  provisioner "remote-exec" {
+#    inline = [
+#      "echo 'Hello'",
+#    ]    
+#    connection {
+#      type        = "ssh"
+#      user        = "ubuntu"
+#      private_key = file("~/.ssh/po-lin-day20-lab-key-pair.pem")
+#      host        = self.public_ip
+#    }
+#  }
+
   tags = {
     Name = "tiffany_frontend_2"
   }
 }
 
+# Back-End Instance
 resource "aws_instance" "tiffany_server_3" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.tiffany_private_subnet_redis.id
-  security_groups = [aws_security_group.tiffany_private_SG_redis.id]
+  vpc_security_group_ids = [aws_security_group.tiffany_private_SG_redis.id]
+  key_name = "po-lin-day20-lab-key-pair"
+
+#  provisioner "remote-exec" {
+#    inline = [
+#      "echo 'Hello'",
+#    ]
+#    connection {
+#      type        = "ssh"
+#      user        = "ubuntu"
+#      private_key = file("~/.ssh/po-lin-day20-lab-key-pair.pem")
+#      host        = self.public_ip
+#    }
+#  }
+
   tags = {
     Name = "tiffany_backend"
   }
@@ -65,7 +109,8 @@ resource "aws_instance" "tiffany_server_4" {
   ami           = "ami-0025245f3ca0bcc82"
   instance_type = "t3.micro"
   subnet_id     = aws_subnet.tiffany_private_subnet_postgresql.id
-  security_groups = [aws_security_group.tiffany_private_SG_postgresql.id]  
+  vpc_security_group_ids = [aws_security_group.tiffany_private_SG_postgresql.id]  
+  key_name = "po-lin-day20-lab-key-pair"
   tags = {
     Name = "tiffany_database"
   }
@@ -124,7 +169,7 @@ resource "aws_subnet" "tiffany_private_subnet_redis" {
   # vpc_id                  = aws_vpc.tiffany_vpc.id
   vpc_id                  = aws_vpc.tiffany_vpc.id
   cidr_block              = "20.0.2.0/24"
-  map_public_ip_on_launch = true
+  # map_public_ip_on_launch = true
   availability_zone       = "eu-west-1b"
  
   tags = {
@@ -182,7 +227,7 @@ resource "aws_route_table" "tiffany_private_rt_postgresql" {
 resource "aws_subnet" "tiffany_private_subnet_postgresql" {
   vpc_id                  = aws_vpc.tiffany_vpc.id
   cidr_block              = "20.0.3.0/24"
-  map_public_ip_on_launch = true
+  # map_public_ip_on_launch = true
   availability_zone       = "eu-west-1a"
  
   tags = {

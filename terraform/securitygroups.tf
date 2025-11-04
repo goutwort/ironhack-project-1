@@ -16,10 +16,17 @@ resource "aws_security_group" "tiffany_public_SG" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
+  ingress {
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }  
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
  #   security_groups = [
  #     aws_security_group.tiffany_private_SG_redis.id,
@@ -40,11 +47,18 @@ resource "aws_security_group" "tiffany_private_SG_redis" {
     security_groups = [aws_security_group.tiffany_public_SG.id]
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }    
+
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.tiffany_private_SG_postgresql.id]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   vpc_id = aws_vpc.tiffany_vpc.id
 }
@@ -63,10 +77,18 @@ resource "aws_security_group" "tiffany_private_SG_postgresql" {
     ]
   }
 
+  # TODO - Change to only allow 22 access from worker and frontend
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }    
+
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "tcp"
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
 #    security_groups = [aws_security_group.tiffany_public_SG.id]    
   }

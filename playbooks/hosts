@@ -1,0 +1,9 @@
+[frontend]
+frontend-instance-1
+# frontend-instance-2 -> you can use this later
+ 
+[backend]
+backend-instance
+ 
+[database]
+db-instance
