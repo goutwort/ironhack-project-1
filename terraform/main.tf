@@ -177,6 +177,17 @@ resource "aws_subnet" "tiffany_private_subnet_redis" {
   }
 }
 
+resource "aws_subnet" "tiffany_private_subnet_postgresql" {
+  vpc_id                  = aws_vpc.tiffany_vpc.id
+  cidr_block              = "20.0.3.0/24"
+  # map_public_ip_on_launch = true
+  availability_zone       = "eu-west-1a"
+ 
+  tags = {
+    Name = "tiffany-PrivateSubnetPostgreSQL"
+  }
+}
+
 resource "aws_internet_gateway" "tiffany_igw" {
   vpc_id = aws_vpc.tiffany_vpc.id
  
@@ -203,7 +214,7 @@ resource "aws_route_table" "tiffany_private_rt_redis" {
  
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.tiffany_igw.id
+    nat_gateway_id = aws_nat_gateway.tiffany_nat_gateway.id
   }
  
   tags = {
@@ -216,22 +227,11 @@ resource "aws_route_table" "tiffany_private_rt_postgresql" {
  
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.tiffany_igw.id
+    nat_gateway_id = aws_nat_gateway.tiffany_nat_gateway.id
   }
  
   tags = {
     Name = "tiffany-PrivateRouteTable_PostgreSQL"
-  }
-}
-
-resource "aws_subnet" "tiffany_private_subnet_postgresql" {
-  vpc_id                  = aws_vpc.tiffany_vpc.id
-  cidr_block              = "20.0.3.0/24"
-  # map_public_ip_on_launch = true
-  availability_zone       = "eu-west-1a"
- 
-  tags = {
-    Name = "tiffany-PrivateSubnetPostgreSQL"
   }
 }
 
