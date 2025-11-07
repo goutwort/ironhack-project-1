@@ -2,22 +2,64 @@
 - name: Backend
   hosts: backend
   tasks:
-    - name: Update apt package index
-      ansible.builtin.apt:
+    - name: Update dnf package index      # for Amazon Linux AMIs
+      ansible.builtin.dnf:                # for Amazon Linux AMIs
         update_cache: yes
+    # - name: Update dnf package index # Let's try not to use this version
+    #   ansible.builtin.package_facts:
+    #     manager: dnf
+    #   become: yes
     - name: Install Docker if not present
-      ansible.builtin.package:
-        name: docker.io
+      ansible.builtin.dnf: # ansible.builtin.package was using yum
+        name: 
+          - docker
+          - python3-pip
+          # - docker-cli
+          # - containerd.io
         state: present
+      become: yes
+    - name: Install Python Docker SDK for Ansible
+      ansible.builtin.pip:
+        name: docker
+        executable: pip3
+    - name: Enable and start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        enabled: yes
+        state: started
+      become: yes
+    - name: Add ec2-user to docker group
+      ansible.builtin.user:
+        name: ec2-user
+        groups: docker
+        append: yes
+      become: yes
     - name: Pull Docker Image
-      docker_image:
+      community.docker.docker_image:
         name: barberry/worker
         source: pull
         tag: latest
     - name: Run Container
-      docker_container:
-        name: client
-        image: barberry/client:latest       # Change!
+      community.docker.docker_container:
+        name: worker
+        image: barberry/worker:latest       # Change!
+        env:
+          DB_HOST: "20.0.3.117"
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: postgres
+          REDIS_HOST: "20.0.2.192"
+          REDIS_PORT: "6379"
+        state: started
+    - name: Pull Docker Image
+      community.docker.docker_image:
+        name: redis
+        source: pull
+        tag: latest
+    - name: Run Container
+      community.docker.docker_container:
+        name: redis
+        image: redis:latest       # Change!
         ports:
           - "6379:6379"      # port mappings
         state: started

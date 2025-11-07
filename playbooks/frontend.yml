@@ -46,6 +46,39 @@
         ports:
           - "80:80"      # port mappings
         env:
-          REDIS_HOST: "20.0.2.254"
+          REDIS_HOST: "20.0.2.192"
           REDIS_PORT: "6379"
+        state: started
+    - name: Pull Docker Image
+      community.docker.docker_image:
+        name: barberry/vote
+        source: pull
+        tag: latest
+    - name: Run Container
+      community.docker.docker_container:
+        name: vote
+        image: barberry/vote:latest       # Change!
+        ports:
+          - "80:80"      # port mappings
+        env:
+          REDIS_HOST: "20.0.2.192"
+          REDIS_PORT: "6379"
+        state: started
+    - name: Pull Docker Image
+      community.docker.docker_image:
+        name: barberry/result
+        source: pull
+        tag: latest
+    - name: Run Container
+      community.docker.docker_container:
+        name: result
+        image: barberry/result:latest       # Change!
+        ports:
+          - "81:80"      # port mappings
+        env:
+          PG_HOST: "20.0.3.117"
+          PG_PORT: "5432"
+          PG_USER: postgres
+          PG_PASSWORD: postgres
+          PG_DATABASE: postgres       
         state: started

@@ -10,6 +10,13 @@ resource "aws_security_group" "tiffany_public_SG" {
   }
 
   ingress {
+    from_port   = 81
+    to_port     = 81
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -72,7 +79,7 @@ resource "aws_security_group" "tiffany_private_SG_postgresql" {
     to_port         = 5432
     protocol        = "tcp"
     security_groups = [
-#      aws_security_group.tiffany_private_SG_redis.id,
+      aws_security_group.tiffany_private_SG_redis.id,
       aws_security_group.tiffany_public_SG.id
     ]
   }
